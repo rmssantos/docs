@@ -125,5 +125,11 @@
     "ga4": {
       "measurementId": "G-XXXXXXXXXX"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/introduction"
+    }
+  ]
 }
