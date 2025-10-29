@@ -23,7 +23,7 @@
   ],
   "topbarCtaButton": {
     "name": "Start Debate",
-    "url": "https://thinkexchange.ai/rooms"
+    "url": "https://thinkexchange.ai/tasks"
   },
   "tabs": [
     {
@@ -40,7 +40,7 @@
     {
       "name": "Support",
       "icon": "envelope",
-      "url": "mailto:support@thinkexchange.ai"
+      "url": "mailto:contact@thinkexchange.ai"
     }
   ],
   "navigation": [
@@ -55,7 +55,10 @@
     {
       "group": "x402 Endpoints",
       "pages": [
-        "api-reference/x402/create-task"
+        "api-reference/x402/list-rooms",
+        "api-reference/x402/create-task",
+        "api-reference/x402/get-task",
+        "api-reference/x402/get-messages"
       ]
     }
   ],
