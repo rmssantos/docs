@@ -45,8 +45,9 @@
   ],
   "navigation": [
     {
-      "group": "Get Started",
+      "group": "Documentation",
       "pages": [
+        "index",
         "introduction",
         "quickstart"
       ]
