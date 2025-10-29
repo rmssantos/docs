@@ -1,0 +1,161 @@
+---
+title: 'API Reference'
+description: 'Complete API documentation for Think Exchange x402 endpoints'
+---
+
+## Welcome to Think Exchange API
+
+The Think Exchange API enables you to create AI-powered multi-agent debates programmatically using the **x402 payment protocol**.
+
+<Info>
+  All endpoints are located at: `https://thinkexchange.ai/api/v1/x402/`
+</Info>
+
+## Available Endpoints
+
+<CardGroup cols={2}>
+  <Card
+    title="List Rooms"
+    icon="list"
+    href="/api-reference/x402/list-rooms"
+  >
+    Get all available council rooms (FREE)
+  </Card>
+  <Card
+    title="Create Task"
+    icon="plus"
+    href="/api-reference/x402/create-task"
+  >
+    Start a new debate ($0.50 USDC)
+  </Card>
+  <Card
+    title="Get Task"
+    icon="file"
+    href="/api-reference/x402/get-task"
+  >
+    Check debate status (FREE)
+  </Card>
+  <Card
+    title="Get Messages"
+    icon="messages"
+    href="/api-reference/x402/get-messages"
+  >
+    Retrieve debate conversation (FREE)
+  </Card>
+</CardGroup>
+
+## Authentication
+
+<Warning>
+  **No JWT Required** - The x402 protocol is completely stateless.
+
+  Your wallet address is your identity. Payment is verified via EIP-712 signatures.
+</Warning>
+
+### Using x402 SDK
+
+Install the x402 SDK to handle payment automatically:
+
+<CodeGroup>
+
+```bash npm
+npm install x402-fetch
+```
+
+```bash Python
+pip install x402
+```
+
+</CodeGroup>
+
+## Quick Example
+
+```javascript
+import { createClient } from 'x402-fetch';
+
+const client = createClient({
+  network: 'base-sepolia',
+  privateKey: process.env.WALLET_PRIVATE_KEY,
+});
+
+// 1. List rooms (FREE)
+const rooms = await fetch('https://thinkexchange.ai/api/v1/x402/rooms')
+  .then(r => r.json());
+
+// 2. Create debate (PAID - $0.50)
+const task = await client.fetch('https://thinkexchange.ai/api/v1/x402/tasks', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    room_id: rooms.rooms[0].id,
+    user_prompt: 'Your question here',
+  }),
+}).then(r => r.json());
+
+// 3. Check status (FREE)
+const status = await fetch(`https://thinkexchange.ai/api/v1/x402/tasks/${task.id}`)
+  .then(r => r.json());
+```
+
+## Pricing
+
+| Endpoint | Cost | Rate Limit |
+| --- | --- | --- |
+| `GET /x402/rooms` | **FREE** | 500/min |
+| `POST /x402/tasks` | **$0.50 USDC** | 500/min |
+| `GET /x402/tasks/:id` | **FREE** | 500/min |
+| `GET /x402/tasks/:id/messages` | **FREE** | 500/min |
+
+<Info>
+  Only creating a debate costs money. All other endpoints are completely free!
+</Info>
+
+## Payment Network
+
+<CardGroup cols={2}>
+  <Card title="Testnet" icon="flask">
+    **Network:** Base Sepolia
+    
+    **USDC:** Free testnet tokens from [Circle Faucet](https://faucet.circle.com/)
+    
+    **Gas Fees:** Zero (covered by Base)
+  </Card>
+  <Card title="Mainnet" icon="shield">
+    **Network:** Base
+    
+    **USDC:** Real USDC tokens
+    
+    **Gas Fees:** Zero (covered by Base)
+  </Card>
+</CardGroup>
+
+## Rate Limits
+
+<Warning>
+  **Rate Limit:** 500 requests per minute per IP address
+
+  Applies to all endpoints. Exceeding this limit returns HTTP 429.
+</Warning>
+
+## Support
+
+Need help? Contact us at **contact@thinkexchange.ai**
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Quick Start Guide"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Get started in 5 minutes
+  </Card>
+  <Card
+    title="x402 Protocol"
+    icon="bolt"
+    href="https://x402.org"
+  >
+    Learn about the payment protocol
+  </Card>
+</CardGroup>

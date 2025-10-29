@@ -53,8 +53,9 @@
       ]
     },
     {
-      "group": "x402 Endpoints",
+      "group": "API Reference",
       "pages": [
+        "api-reference/introduction",
         "api-reference/x402/list-rooms",
         "api-reference/x402/create-task",
         "api-reference/x402/get-task",
