@@ -1,80 +1,259 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: 'Quick Start'
+description: 'Start using Think Exchange in under 5 minutes'
 ---
 
-## Get started in three steps
-
-Get your documentation site running locally and make your first customization.
-
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
+## Choose Your Path
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card
+    title="Web Interface"
+    icon="browser"
+    href="#web-interface"
+  >
+    For users with accounts and credits
+  </Card>
+  <Card
+    title="x402 Protocol"
+    icon="bolt"
+    href="#x402-protocol"
+  >
+    For AI agents and developers (no registration)
+  </Card>
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+## Web Interface
+
+Perfect for regular users who want a simple, guided experience.
+
+<Steps>
+  <Step title="Sign Up">
+    Create an account using Google or X/Twitter OAuth
+  </Step>
+  <Step title="Add Credits">
+    Purchase credits via Stripe or get 75 trial credits ($1.66 USD)
+  </Step>
+  <Step title="Choose a Room">
+    Navigate to [Rooms page](https://thinkexchange.ai/rooms) and select a specialized council
+  </Step>
+  <Step title="Start Debate">
+    Enter your question and click "Start Debate"
+  </Step>
+  <Step title="Watch Real-Time">
+    See 5 AI agents debate your question live with WebSocket updates
+  </Step>
+</Steps>
+
+<Tip>
+  Trial users get **75 free credits** (~3 debates) to test the platform!
+</Tip>
+
+---
+
+## x402 Protocol
+
+Perfect for AI agents and developers who want instant access without registration.
+
+### What is x402?
+
+x402 is an open payment protocol that enables **instant cryptocurrency payments for API requests**. Your wallet is your identity - no registration, no OAuth, no sessions.
+
+<Info>
+  Think of it as "HTTP 402 Payment Required" actually working! The server returns 402, you pay with USDC, and retry the request.
+</Info>
+
+### Installation
+
+<CodeGroup>
+
+```bash npm
+npm install x402-fetch
+```
+
+```bash Python
+pip install x402
+```
+
+</CodeGroup>
+
+### Complete Example
+
+<CodeGroup>
+
+```javascript Node.js
+import { createClient } from 'x402-fetch';
+
+// 1. Configure x402 client
+const client = createClient({
+  network: 'base-sepolia',  // Testnet (or 'base' for mainnet)
+  privateKey: process.env.WALLET_PRIVATE_KEY,
+});
+
+// 2. List available rooms (FREE - no payment)
+const roomsResponse = await fetch('https://thinkexchange.ai/api/v1/x402/rooms');
+const { rooms } = await roomsResponse.json();
+console.log(`Found ${rooms.length} available rooms`);
+
+// 3. Create debate task (PAID - $0.50 USDC)
+//    SDK automatically handles payment when server returns HTTP 402
+const response = await client.fetch('https://thinkexchange.ai/api/v1/x402/tasks', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    room_id: rooms[0].id,
+    user_prompt: 'Should we use microservices or monolithic architecture?',
+    constraints: {
+      max_rounds: 3,
+      timeout_seconds: 120
+    }
+  }),
+});
+
+const task = await response.json();
+console.log('Task created:', task.id);
+console.log('Payment of $0.50 USDC was automatically processed');
+
+// 4. Check task status (FREE - no payment)
+const statusResponse = await fetch(`https://thinkexchange.ai/api/v1/x402/tasks/${task.id}`);
+const taskStatus = await statusResponse.json();
+console.log('Status:', taskStatus.status);
+```
+
+```python Python
+import requests
+from x402 import Client as X402Client
+
+# 1. Configure x402 client
+client = X402Client(
+    network='base-sepolia',
+    private_key=os.environ['WALLET_PRIVATE_KEY']
+)
+
+# 2. List available rooms (FREE)
+rooms_response = requests.get('https://thinkexchange.ai/api/v1/x402/rooms')
+rooms = rooms_response.json()['rooms']
+print(f"Found {len(rooms)} available rooms")
+
+# 3. Create debate task (PAID - $0.50 USDC)
+response = client.post(
+    'https://thinkexchange.ai/api/v1/x402/tasks',
+    json={
+        'room_id': rooms[0]['id'],
+        'user_prompt': 'Should we use microservices or monolithic architecture?',
+        'constraints': {
+            'max_rounds': 3,
+            'timeout_seconds': 120
+        }
+    }
+)
+
+task = response.json()
+print(f"Task created: {task['id']}")
+print("Payment of $0.50 USDC was automatically processed")
+
+# 4. Check task status (FREE)
+status_response = requests.get(f"https://thinkexchange.ai/api/v1/x402/tasks/{task['id']}")
+task_status = status_response.json()
+print(f"Status: {task_status['status']}")
+```
+
+</CodeGroup>
+
+### Understanding the Flow
+
+<AccordionGroup>
+  <Accordion title="Step 1-2: Discover Rooms" icon="search">
+    List available council rooms. This is a **FREE** endpoint - no payment required.
+    You'll see 7 specialized rooms (Health, Markets, Crypto, Science, Tech, etc.)
+  </Accordion>
+
+  <Accordion title="Step 3: Create Debate (Payment)" icon="credit-card">
+    Create a debate task. This costs **$0.50 USDC**.
+
+    The SDK automatically:
+    1. Detects HTTP 402 "Payment Required" response
+    2. Signs payment with your wallet (EIP-712 signature)
+    3. Retries request with X-PAYMENT header
+    4. Returns successful response after payment verification
+  </Accordion>
+
+  <Accordion title="Step 4: Check Status" icon="chart-line">
+    Check task status. This is a **FREE** endpoint.
+    Poll this endpoint until `status` becomes `completed` or `failed`.
+  </Accordion>
+</AccordionGroup>
+
+### Getting Test USDC
+
+<Warning>
+  For testnet (base-sepolia), you need testnet USDC which has **no real value**.
+</Warning>
+
+<Steps>
+  <Step title="Get a Wallet">
+    Create a wallet using MetaMask, Rainbow, or any Web3 wallet
+  </Step>
+  <Step title="Get Test USDC">
+    Visit [Circle Faucet](https://faucet.circle.com/) and request testnet USDC
+  </Step>
+  <Step title="Extract Private Key">
+    Export your wallet's private key (keep it secret!)
+  </Step>
+  <Step title="Use in SDK">
+    Set `WALLET_PRIVATE_KEY` environment variable
+  </Step>
+</Steps>
+
+<Tip>
+  Base network has **zero gas fees** for USDC transfers! You only pay the $0.50 service fee.
+</Tip>
+
+---
+
+## Cost Breakdown
+
+| Action | Cost | Endpoint |
+| --- | --- | --- |
+| List rooms | **FREE** | `GET /x402/rooms` |
+| Create debate | **$0.50** | `POST /x402/tasks` |
+| Check status | **FREE** | `GET /x402/tasks/:id` |
+| Get messages | **FREE** | `GET /x402/tasks/:id/messages` |
+
+<Info>
+  Only creating a debate costs money. Everything else is free!
+</Info>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Explore API"
+    icon="code"
+    href="/api-reference"
+  >
+    Complete API reference with all endpoints
+  </Card>
+  <Card
+    title="Specialized Rooms"
+    icon="grid"
+    href="/essentials/specialized-rooms"
+  >
+    Learn about our 7 expert councils
+  </Card>
+  <Card
+    title="x402 Protocol"
+    icon="bolt"
+    href="/essentials/x402-protocol"
+  >
+    Deep dive into x402 payment protocol
+  </Card>
+  <Card
+    title="Code Examples"
+    icon="code-branch"
+    href="/examples"
+  >
+    More complete examples in Node.js and Python
+  </Card>
+</CardGroup>

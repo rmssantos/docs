@@ -1,0 +1,273 @@
+---
+title: 'Create Debate Task'
+api: 'POST https://thinkexchange.ai/api/v1/x402/tasks'
+description: 'Create a new AI Council debate task with x402 payment'
+---
+
+## Overview
+
+Create a debate task by submitting a question to a specialized council room. This endpoint requires payment via x402 protocol.
+
+<Info>
+  **Price:** $0.50 USD (paid in USDC on Base blockchain)
+
+  The x402 SDK handles payment automatically when the server returns HTTP 402.
+</Info>
+
+## Authentication
+
+<Warning>
+  **No JWT required** - x402 is stateless. Your wallet address is your identity.
+
+  Payment is verified via EIP-712 signature in the X-PAYMENT header.
+</Warning>
+
+## Request
+
+<ParamField body="room_id" type="string" required>
+  The ID of the council room to use. Get available rooms from `GET /x402/rooms`.
+</ParamField>
+
+<ParamField body="user_prompt" type="string" required>
+  Your question or problem for the AI council to debate.
+
+  Example: "Should we use microservices or monolithic architecture for our e-commerce platform?"
+</ParamField>
+
+<ParamField body="constraints" type="object">
+  Optional constraints for the debate.
+
+  <Expandable title="properties">
+    <ParamField body="max_rounds" type="number" default={3}>
+      Maximum number of debate rounds (1-10)
+    </ParamField>
+
+    <ParamField body="timeout_seconds" type="number" default={120}>
+      Maximum time for debate completion (30-300)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+### Example Request
+
+<CodeGroup>
+
+```javascript Node.js (x402-fetch)
+import { createClient } from 'x402-fetch';
+
+const client = createClient({
+  network: 'base-sepolia',
+  privateKey: process.env.WALLET_PRIVATE_KEY,
+});
+
+const response = await client.fetch('https://thinkexchange.ai/api/v1/x402/tasks', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    room_id: 'room_id_here',
+    user_prompt: 'What are the best practices for API versioning?',
+    constraints: {
+      max_rounds: 3,
+      timeout_seconds: 120
+    }
+  }),
+});
+
+const task = await response.json();
+```
+
+```python Python (x402)
+from x402 import Client
+
+client = Client(
+    network='base-sepolia',
+    private_key=os.environ['WALLET_PRIVATE_KEY']
+)
+
+response = client.post(
+    'https://thinkexchange.ai/api/v1/x402/tasks',
+    json={
+        'room_id': 'room_id_here',
+        'user_prompt': 'What are the best practices for API versioning?',
+        'constraints': {
+            'max_rounds': 3,
+            'timeout_seconds': 120
+        }
+    }
+)
+
+task = response.json()
+```
+
+```bash cURL (Manual)
+# First request (will return 402 Payment Required)
+curl -X POST https://thinkexchange.ai/api/v1/x402/tasks \
+  -H "Content-Type: application/json" \
+  -d '{
+    "room_id": "room_id_here",
+    "user_prompt": "Your question here"
+  }'
+
+# Response will include payment requirements
+# Use x402 SDK to handle payment automatically
+```
+
+</CodeGroup>
+
+## Response
+
+### Success (201 Created)
+
+<ResponseField name="id" type="string">
+  Unique task identifier
+</ResponseField>
+
+<ResponseField name="room_id" type="string">
+  ID of the council room used
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current task status: `pending`, `in_progress`, `completed`, or `failed`
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of task creation
+</ResponseField>
+
+<ResponseField name="payment_method" type="string">
+  Always `x402` for this endpoint
+</ResponseField>
+
+<ResponseField name="websocket_url" type="string">
+  WebSocket URL for real-time updates (optional)
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "id": "task_abc123xyz",
+  "room_id": "380b3b3c-29fc-43c2-8367-e29b6d52240e",
+  "status": "pending",
+  "created_at": "2025-10-29T17:00:00Z",
+  "payment_method": "x402",
+  "websocket_url": "wss://thinkexchange.ai/api/v1/ws/tasks/task_abc123xyz"
+}
+```
+
+### Payment Required (402)
+
+When no payment is provided, the server returns 402 with payment requirements:
+
+```json
+{
+  "x402Version": 1,
+  "error": "X-PAYMENT header is required",
+  "accepts": [{
+    "scheme": "exact",
+    "network": "base-sepolia",
+    "maxAmountRequired": "500000",
+    "resource": "http://thinkexchange.ai/x402/tasks",
+    "description": "Create an AI Council debate task with multiple AI agents",
+    "payTo": "0x7497662f19086323333464ccd3c46557a4d08e50",
+    "maxTimeoutSeconds": 120,
+    "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "room_id": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    }
+  }]
+}
+```
+
+<Warning>
+  **Don't handle 402 manually!**
+
+  Use the x402 SDK which automatically:
+  1. Detects HTTP 402 response
+  2. Signs EIP-712 payment message
+  3. Retries with X-PAYMENT header
+  4. Returns success response
+</Warning>
+
+## Error Responses
+
+<ResponseField name="400" type="Bad Request">
+  Invalid request parameters (missing room_id, invalid user_prompt, etc.)
+</ResponseField>
+
+<ResponseField name="402" type="Payment Required">
+  Missing or invalid payment. Use x402 SDK to handle automatically.
+</ResponseField>
+
+<ResponseField name="429" type="Too Many Requests">
+  Rate limit exceeded (500 requests per minute per IP)
+</ResponseField>
+
+<ResponseField name="500" type="Internal Server Error">
+  Server error. Contact support if persistent.
+</ResponseField>
+
+## After Creating a Task
+
+Once created, you can:
+
+<CardGroup cols={2}>
+  <Card title="Check Status" icon="chart-line" href="/api-reference/tasks/get">
+    Poll `GET /x402/tasks/:id` to check completion status
+  </Card>
+  <Card title="Get Messages" icon="messages" href="/api-reference/tasks/messages">
+    Retrieve full debate conversation with `GET /x402/tasks/:id/messages`
+  </Card>
+  <Card title="WebSocket" icon="plug">
+    Connect to WebSocket URL for real-time updates
+  </Card>
+  <Card title="Wait for Completion" icon="clock">
+    Typical debates complete in 30-120 seconds
+  </Card>
+</CardGroup>
+
+## Pricing
+
+<Info>
+  **Fixed Price:** $0.50 USD per debate
+
+  Includes:
+  - 5 specialized AI agents
+  - 3 rounds of debate (customizable)
+  - WebSocket real-time updates
+  - Full conversation history
+  - Up to 120 seconds processing time
+
+  **Network:** Base (mainnet) or Base Sepolia (testnet)
+
+  **Currency:** USDC (6 decimals) = 500,000 microUSDC
+
+  **Gas Fees:** Zero (Base network covers USDC transfer fees)
+</Info>
+
+## Rate Limits
+
+<Warning>
+  **Rate Limit:** 500 requests per minute per IP address
+
+  Applies to all endpoints. Exceeding this limit returns HTTP 429.
+</Warning>
+
+## Related Endpoints
+
+<CardGroup cols={3}>
+  <Card title="List Rooms" icon="list" href="/api-reference/rooms/list">
+    Get available council rooms
+  </Card>
+  <Card title="Get Task" icon="file" href="/api-reference/tasks/get">
+    Check task status
+  </Card>
+  <Card title="Get Messages" icon="messages" href="/api-reference/tasks/messages">
+    Retrieve debate conversation
+  </Card>
+</CardGroup>

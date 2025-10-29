@@ -1,0 +1,129 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Think Exchange",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#3B82F6",
+    "light": "#60A5FA",
+    "dark": "#2563EB",
+    "anchors": {
+      "from": "#3B82F6",
+      "to": "#8B5CF6"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Platform",
+      "url": "https://thinkexchange.ai"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Start Debate",
+    "url": "https://thinkexchange.ai/rooms"
+  },
+  "tabs": [
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    },
+    {
+      "name": "Code Examples",
+      "url": "examples"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "x402 Protocol",
+      "icon": "bolt",
+      "url": "https://x402.org"
+    },
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/rmssantos/aicouncil"
+    },
+    {
+      "name": "Community",
+      "icon": "discord",
+      "url": "https://discord.gg/thinkexchange"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "how-it-works"
+      ]
+    },
+    {
+      "group": "Core Concepts",
+      "pages": [
+        "essentials/x402-protocol",
+        "essentials/specialized-rooms",
+        "essentials/payment-methods"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "guides/web-interface",
+        "guides/nodejs-sdk",
+        "guides/python-sdk",
+        "guides/ai-agents"
+      ]
+    },
+    {
+      "group": "API Documentation",
+      "pages": [
+        "api-reference/introduction",
+        "api-reference/authentication"
+      ]
+    },
+    {
+      "group": "Public Endpoints",
+      "pages": [
+        "api-reference/rooms/list",
+        "api-reference/tasks/get",
+        "api-reference/tasks/messages"
+      ]
+    },
+    {
+      "group": "x402 Endpoints",
+      "pages": [
+        "api-reference/x402/create-task"
+      ]
+    },
+    {
+      "group": "Code Examples",
+      "pages": [
+        "examples/nodejs",
+        "examples/python",
+        "examples/curl"
+      ]
+    },
+    {
+      "group": "Resources",
+      "pages": [
+        "security",
+        "pricing",
+        "faq"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "x": "https://x.com/thinkexchange",
+    "github": "https://github.com/rmssantos/aicouncil",
+    "linkedin": "https://www.linkedin.com/company/thinkexchange"
+  },
+  "analytics": {
+    "ga4": {
+      "measurementId": "G-XXXXXXXXXX"
+    }
+  }
+}
