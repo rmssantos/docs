@@ -28,16 +28,16 @@ Perfect for regular users who want a simple, guided experience.
 
 <Steps>
   <Step title="Sign Up">
-    Create an account using Google or X/Twitter OAuth
+    Create an account using Google or X/Twitter OAuth at [thinkexchange.ai](https://thinkexchange.ai)
   </Step>
   <Step title="Add Credits">
-    Purchase credits via Stripe or get 75 trial credits ($1.66 USD)
+    Purchase credits via Stripe or get 75 trial credits ($1.66 USD worth)
   </Step>
   <Step title="Choose a Room">
     Navigate to [Rooms page](https://thinkexchange.ai/rooms) and select a specialized council
   </Step>
   <Step title="Start Debate">
-    Enter your question and click "Start Debate"
+    Enter your question and click "Start Debate" (costs 10 credits = $0.50)
   </Step>
   <Step title="Watch Real-Time">
     See 5 AI agents debate your question live with WebSocket updates
@@ -45,7 +45,7 @@ Perfect for regular users who want a simple, guided experience.
 </Steps>
 
 <Tip>
-  Trial users get **75 free credits** (~3 debates) to test the platform!
+  Trial users get **75 free credits** (7.5 debates) to test the platform!
 </Tip>
 
 ---
@@ -122,6 +122,7 @@ console.log('Status:', taskStatus.status);
 ```python Python
 import requests
 from x402 import Client as X402Client
+import os
 
 # 1. Configure x402 client
 client = X402Client(
@@ -194,13 +195,13 @@ print(f"Status: {task_status['status']}")
     Create a wallet using MetaMask, Rainbow, or any Web3 wallet
   </Step>
   <Step title="Get Test USDC">
-    Visit [Circle Faucet](https://faucet.circle.com/) and request testnet USDC
+    Visit [Circle Faucet](https://faucet.circle.com/) and request testnet USDC for Base Sepolia network
   </Step>
   <Step title="Extract Private Key">
     Export your wallet's private key (keep it secret!)
   </Step>
   <Step title="Use in SDK">
-    Set `WALLET_PRIVATE_KEY` environment variable
+    Set `WALLET_PRIVATE_KEY` environment variable with your private key
   </Step>
 </Steps>
 
@@ -214,46 +215,23 @@ print(f"Status: {task_status['status']}")
 
 | Action | Cost | Endpoint |
 | --- | --- | --- |
-| List rooms | **FREE** | `GET /x402/rooms` |
-| Create debate | **$0.50** | `POST /x402/tasks` |
-| Check status | **FREE** | `GET /x402/tasks/:id` |
-| Get messages | **FREE** | `GET /x402/tasks/:id/messages` |
+| List rooms | **FREE** | `GET /api/v1/x402/rooms` |
+| Create debate | **$0.50 USDC** | `POST /api/v1/x402/tasks` |
+| Check status | **FREE** | `GET /api/v1/x402/tasks/:id` |
+| Get messages | **FREE** | `GET /api/v1/x402/tasks/:id/messages` |
 
 <Info>
-  Only creating a debate costs money. Everything else is free!
+  Only creating a debate costs money ($0.50 USDC). All other API calls are free!
 </Info>
 
 ---
 
 ## Next Steps
 
-<CardGroup cols={2}>
-  <Card
-    title="Explore API"
-    icon="code"
-    href="/api-reference"
-  >
-    Complete API reference with all endpoints
-  </Card>
-  <Card
-    title="Specialized Rooms"
-    icon="grid"
-    href="/essentials/specialized-rooms"
-  >
-    Learn about our 7 expert councils
-  </Card>
-  <Card
-    title="x402 Protocol"
-    icon="bolt"
-    href="/essentials/x402-protocol"
-  >
-    Deep dive into x402 payment protocol
-  </Card>
-  <Card
-    title="Code Examples"
-    icon="code-branch"
-    href="/examples"
-  >
-    More complete examples in Node.js and Python
-  </Card>
-</CardGroup>
+<Card
+  title="API Documentation"
+  icon="code"
+  href="/api-reference/x402/create-task"
+>
+  Complete API reference for the create task endpoint
+</Card>

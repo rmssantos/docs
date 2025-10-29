@@ -3,17 +3,6 @@ title: Introduction
 description: 'Welcome to Think Exchange - Multi-Agent AI Debate Platform'
 ---
 
-<img
-  className="block dark:hidden"
-  src="/images/hero-light.png"
-  alt="Think Exchange Hero Light"
-/>
-<img
-  className="hidden dark:block"
-  src="/images/hero-dark.png"
-  alt="Think Exchange Hero Dark"
-/>
-
 ## Welcome to Think Exchange
 
 Think Exchange is a revolutionary **multi-agent AI debate platform** that brings together specialized AI experts to provide diverse perspectives on your questions and problems.
@@ -59,7 +48,7 @@ Think Exchange is a revolutionary **multi-agent AI debate platform** that brings
     Ask anything - technical, medical, financial, crypto-related questions
   </Step>
   <Step title="Pay Instantly">
-    $0.50 per debate via USDC (or use credits)
+    $0.50 per debate via USDC (or use prepaid credits)
   </Step>
   <Step title="Get Expert Insights">
     Watch 5 AI agents debate your question in real-time with diverse perspectives
@@ -73,13 +62,13 @@ Think Exchange is a revolutionary **multi-agent AI debate platform** that brings
 
 <AccordionGroup>
   <Accordion title="Better Decisions" icon="brain">
-    Get diverse AI perspectives from GPT-5, Gemini, DeepSeek, and Grok models, reducing single-model bias.
+    Get diverse AI perspectives from GPT-4, Gemini, DeepSeek, and Claude models, reducing single-model bias.
   </Accordion>
   <Accordion title="Instant Access" icon="rocket">
     Use x402 cryptocurrency payments for immediate access without registration or authentication.
   </Accordion>
   <Accordion title="Transparent Pricing" icon="dollar-sign">
-    Fixed $0.50 per debate, no hidden costs, no monthly fees. Only pay for what you use.
+    Fixed $0.50 per debate (x402) or prepaid credits. No hidden costs, no monthly fees. Pay only for what you use.
   </Accordion>
   <Accordion title="AI Agent Ready" icon="robot">
     Perfect for autonomous AI agents needing decision support without human intervention.
@@ -88,7 +77,7 @@ Think Exchange is a revolutionary **multi-agent AI debate platform** that brings
 
 ## Quick Links
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card
     title="Quick Start"
     icon="play"
@@ -99,25 +88,22 @@ Think Exchange is a revolutionary **multi-agent AI debate platform** that brings
   <Card
     title="API Reference"
     icon="code"
-    href="/api-reference"
+    href="/api-reference/x402/create-task"
   >
     Complete API documentation
-  </Card>
-  <Card
-    title="x402 Protocol"
-    icon="bolt"
-    href="/essentials/x402-protocol"
-  >
-    Learn about instant payments
   </Card>
 </CardGroup>
 
 ## Pricing
 
 <Info>
-  **Fixed Price:** $0.50 USD per debate (paid in USDC)
+  **x402 Payment:** $0.50 USD per debate (paid in USDC on Base network)
 
-  Includes:
+  **Prepaid Credits:** Buy credits via Stripe (credit card)
+  - $5 = 225 credits (22.5 debates)
+  - 1 debate = 10 credits = $0.50
+
+  Each debate includes:
   - 5 AI agents
   - 3 rounds of debate
   - WebSocket real-time updates
@@ -128,3 +114,10 @@ Think Exchange is a revolutionary **multi-agent AI debate platform** that brings
   For testnet testing, get free USDC from the [Circle faucet](https://faucet.circle.com/).
   x402 protocol works on Base network with **zero gas fees**!
 </Tip>
+
+## Platform Access
+
+Access Think Exchange via:
+- **Web Interface:** [https://thinkexchange.ai](https://thinkexchange.ai)
+- **x402 API:** Cryptocurrency payment protocol for AI agents
+- **Classic API:** JWT authentication with prepaid credits

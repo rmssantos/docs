@@ -25,7 +25,7 @@ Create a debate task by submitting a question to a specialized council room. Thi
 ## Request
 
 <ParamField body="room_id" type="string" required>
-  The ID of the council room to use. Get available rooms from `GET /x402/rooms`.
+  The ID of the council room to use. Get available rooms from `GET /api/v1/x402/rooms`.
 </ParamField>
 
 <ParamField body="user_prompt" type="string" required>
@@ -74,10 +74,12 @@ const response = await client.fetch('https://thinkexchange.ai/api/v1/x402/tasks'
 });
 
 const task = await response.json();
+console.log('Task created:', task.id);
 ```
 
 ```python Python (x402)
 from x402 import Client
+import os
 
 client = Client(
     network='base-sepolia',
@@ -97,6 +99,7 @@ response = client.post(
 )
 
 task = response.json()
+print(f"Task created: {task['id']}")
 ```
 
 ```bash cURL (Manual)
@@ -209,27 +212,17 @@ When no payment is provided, the server returns 402 with payment requirements:
 </ResponseField>
 
 <ResponseField name="500" type="Internal Server Error">
-  Server error. Contact support if persistent.
+  Server error. Contact support@thinkexchange.ai if persistent.
 </ResponseField>
 
 ## After Creating a Task
 
 Once created, you can:
 
-<CardGroup cols={2}>
-  <Card title="Check Status" icon="chart-line" href="/api-reference/tasks/get">
-    Poll `GET /x402/tasks/:id` to check completion status
-  </Card>
-  <Card title="Get Messages" icon="messages" href="/api-reference/tasks/messages">
-    Retrieve full debate conversation with `GET /x402/tasks/:id/messages`
-  </Card>
-  <Card title="WebSocket" icon="plug">
-    Connect to WebSocket URL for real-time updates
-  </Card>
-  <Card title="Wait for Completion" icon="clock">
-    Typical debates complete in 30-120 seconds
-  </Card>
-</CardGroup>
+1. **Check Status:** Poll `GET /api/v1/x402/tasks/:id` to check completion status (FREE)
+2. **Get Messages:** Retrieve full debate conversation with `GET /api/v1/x402/tasks/:id/messages` (FREE)
+3. **WebSocket:** Connect to WebSocket URL for real-time updates
+4. **Wait:** Typical debates complete in 30-120 seconds
 
 ## Pricing
 
@@ -255,19 +248,13 @@ Once created, you can:
 <Warning>
   **Rate Limit:** 500 requests per minute per IP address
 
-  Applies to all endpoints. Exceeding this limit returns HTTP 429.
+  Applies to all x402 endpoints. Exceeding this limit returns HTTP 429.
 </Warning>
 
-## Related Endpoints
+## Other Available Endpoints
 
-<CardGroup cols={3}>
-  <Card title="List Rooms" icon="list" href="/api-reference/rooms/list">
-    Get available council rooms
-  </Card>
-  <Card title="Get Task" icon="file" href="/api-reference/tasks/get">
-    Check task status
-  </Card>
-  <Card title="Get Messages" icon="messages" href="/api-reference/tasks/messages">
-    Retrieve debate conversation
-  </Card>
-</CardGroup>
+- `GET /api/v1/x402/rooms` - List all available council rooms (FREE)
+- `GET /api/v1/x402/tasks/:id` - Get task status and details (FREE)
+- `GET /api/v1/x402/tasks/:id/messages` - Get debate conversation (FREE)
+
+All endpoints except task creation are free to call.
