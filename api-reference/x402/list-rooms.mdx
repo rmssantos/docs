@@ -1,50 +1,56 @@
 ---
 title: 'List Council Rooms'
 api: 'GET https://thinkexchange.ai/api/v1/x402/rooms'
-description: 'Get all available specialized council rooms'
+description: 'Get available AI council rooms for debates'
 ---
 
 ## Overview
 
-Returns a list of all available specialized council rooms. This endpoint is **FREE** - no payment or authentication required.
+Returns a list of available council rooms that you can use for debates. Each room has a specialized configuration of AI agents with different expertise areas.
 
 <Info>
-  **Price:** FREE
+  **This endpoint is FREE** - No payment required
 
-  This endpoint does not require payment, JWT authentication, or x402 payment.
+  Use this to discover available rooms before creating a task.
 </Info>
+
+## Authentication
+
+<Check>
+  **No authentication required** - This is a public endpoint
+</Check>
 
 ## Request
 
-No parameters required. Simply make a GET request to the endpoint.
+No parameters required.
 
 ### Example Request
 
 <CodeGroup>
 
-```javascript Node.js (fetch)
+```bash cURL
+curl https://thinkexchange.ai/api/v1/x402/rooms
+```
+
+```javascript Node.js
 const response = await fetch('https://thinkexchange.ai/api/v1/x402/rooms');
 const data = await response.json();
 
-console.log(`Found ${data.rooms.length} available rooms`);
+console.log(`Found ${data.rooms.length} rooms`);
 data.rooms.forEach(room => {
   console.log(`- ${room.name}: ${room.description}`);
 });
 ```
 
-```python Python (requests)
+```python Python
 import requests
 
 response = requests.get('https://thinkexchange.ai/api/v1/x402/rooms')
 data = response.json()
 
-print(f"Found {len(data['rooms'])} available rooms")
+print(f"Found {len(data['rooms'])} rooms")
 for room in data['rooms']:
     print(f"- {room['name']}: {room['description']}")
-```
-
-```bash cURL
-curl https://thinkexchange.ai/api/v1/x402/rooms
 ```
 
 </CodeGroup>
@@ -58,27 +64,45 @@ curl https://thinkexchange.ai/api/v1/x402/rooms
 
   <Expandable title="Room object properties">
     <ResponseField name="id" type="string">
-      Unique room identifier (UUID)
+      Unique room identifier - Use this when creating tasks
     </ResponseField>
 
     <ResponseField name="name" type="string">
-      Display name of the room
+      Human-readable room name
     </ResponseField>
 
     <ResponseField name="description" type="string">
-      Brief description of the room's expertise
+      Description of the room's purpose and expertise
     </ResponseField>
 
-    <ResponseField name="specialty" type="string">
-      Area of specialization (e.g., "health", "crypto", "technology")
+    <ResponseField name="agent_configs" type="array">
+      Array of AI agents in this room
+
+      <Expandable title="Agent configuration">
+        <ResponseField name="name" type="string">
+          Agent's role (e.g., "CTO", "Security Engineer")
+        </ResponseField>
+
+        <ResponseField name="system_prompt" type="string">
+          Agent's expertise and instructions
+        </ResponseField>
+
+        <ResponseField name="model" type="string">
+          AI model used (e.g., "gpt-4o", "claude-3-5-sonnet")
+        </ResponseField>
+
+        <ResponseField name="temperature" type="number">
+          Model temperature (creativity level)
+        </ResponseField>
+      </Expandable>
     </ResponseField>
 
-    <ResponseField name="agents_count" type="number">
-      Number of AI agents in this room (typically 5)
+    <ResponseField name="is_system" type="boolean">
+      Whether this is a default system room
     </ResponseField>
 
-    <ResponseField name="is_active" type="boolean">
-      Whether the room is currently accepting debates
+    <ResponseField name="is_public" type="boolean">
+      Whether this room is publicly accessible
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -90,126 +114,152 @@ curl https://thinkexchange.ai/api/v1/x402/rooms
   "rooms": [
     {
       "id": "380b3b3c-29fc-43c2-8367-e29b6d52240e",
-      "name": "General Council",
-      "description": "General-purpose AI council for diverse topics",
-      "specialty": "general",
-      "agents_count": 5,
-      "is_active": true
-    },
-    {
-      "id": "7f8e9c1d-4b5a-6c7d-8e9f-0a1b2c3d4e5f",
-      "name": "Health & Medical Council",
-      "description": "Specialized in medical, health, and wellness topics",
-      "specialty": "health",
-      "agents_count": 5,
-      "is_active": true
-    },
-    {
-      "id": "9a8b7c6d-5e4f-3d2c-1b0a-9f8e7d6c5b4a",
-      "name": "Crypto & Blockchain Council",
-      "description": "Experts in cryptocurrency, blockchain, and DeFi",
-      "specialty": "crypto",
-      "agents_count": 5,
-      "is_active": true
-    },
-    {
-      "id": "1c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
-      "name": "Markets & Finance Council",
-      "description": "Financial markets, trading, and investment analysis",
-      "specialty": "markets",
-      "agents_count": 5,
-      "is_active": true
-    },
-    {
-      "id": "2d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-      "name": "Science & Research Council",
-      "description": "Scientific research, data analysis, and academic topics",
-      "specialty": "science",
-      "agents_count": 5,
-      "is_active": true
-    },
-    {
-      "id": "3e4f5a6b-7c8d-9e0f-1a2b-3c4d5e6f7a8b",
-      "name": "Technology Council",
-      "description": "Software engineering, DevOps, and technical architecture",
-      "specialty": "technology",
-      "agents_count": 5,
-      "is_active": true
-    },
-    {
-      "id": "4f5a6b7c-8d9e-0f1a-2b3c-4d5e6f7a8b9c",
-      "name": "Law & Governance Council",
-      "description": "Legal, regulatory, and governance topics",
-      "specialty": "law",
-      "agents_count": 5,
-      "is_active": true
+      "name": "Tech Leadership Council",
+      "description": "Senior technology leaders debate architecture, security, and strategy",
+      "agent_configs": [
+        {
+          "name": "CTO",
+          "system_prompt": "You are a CTO with 15 years of experience...",
+          "model": "gpt-4o",
+          "temperature": 0.7
+        },
+        {
+          "name": "Security Engineer",
+          "system_prompt": "You are a security expert specializing in...",
+          "model": "claude-3-5-sonnet-20241022",
+          "temperature": 0.6
+        },
+        {
+          "name": "Solutions Architect",
+          "system_prompt": "You design scalable cloud architectures...",
+          "model": "gpt-4o",
+          "temperature": 0.7
+        },
+        {
+          "name": "DevOps Lead",
+          "system_prompt": "You specialize in CI/CD, infrastructure...",
+          "model": "gemini-2.0-flash-exp",
+          "temperature": 0.7
+        },
+        {
+          "name": "Innovation Lead",
+          "system_prompt": "You research emerging technologies...",
+          "model": "gpt-4o-mini",
+          "temperature": 0.8
+        }
+      ],
+      "is_system": true,
+      "is_public": true
     }
   ]
 }
 ```
 
+## Room Types
+
+<CardGroup cols={2}>
+  <Card title="Tech Leadership Council" icon="code">
+    **Best for:** Architecture, infrastructure, security decisions
+
+    Agents: CTO, Security Engineer, Solutions Architect, DevOps Lead, Innovation Lead
+  </Card>
+
+  <Card title="Custom Rooms" icon="users">
+    **Coming soon:** Create custom rooms with your own agent configurations
+
+    Contact us for early access
+  </Card>
+</CardGroup>
+
+## Using Room IDs
+
+After getting a room ID, use it to create a task:
+
+```javascript
+// 1. Get available rooms
+const roomsResponse = await fetch('https://thinkexchange.ai/api/v1/x402/rooms');
+const { rooms } = await roomsResponse.json();
+
+// 2. Pick a room
+const techLeadershipRoom = rooms.find(r => r.name === 'Tech Leadership Council');
+
+// 3. Create a task with that room
+const signer = await createSigner('base-sepolia', process.env.WALLET_PRIVATE_KEY);
+const fetchWithPayment = wrapFetchWithPayment(fetch, signer);
+
+const taskResponse = await fetchWithPayment('https://thinkexchange.ai/api/v1/x402/tasks', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    room_id: techLeadershipRoom.id,  // ← Use the room ID here
+    user_prompt: 'Should we migrate to microservices?'
+  })
+});
+```
+
+## Agent Expertise
+
+Each room has specialized agents:
+
+<AccordionGroup>
+  <Accordion title="CTO" icon="user-tie">
+    - Strategic technology decisions
+    - Cost vs. benefit analysis
+    - Long-term technical roadmaps
+    - Risk assessment
+    - Team and resource planning
+  </Accordion>
+
+  <Accordion title="Security Engineer" icon="shield">
+    - Security vulnerabilities
+    - Authentication & authorization
+    - Data protection and encryption
+    - Compliance (GDPR, HIPAA, SOC2)
+    - Threat modeling
+  </Accordion>
+
+  <Accordion title="Solutions Architect" icon="sitemap">
+    - System design patterns
+    - Scalability and performance
+    - Cloud architecture (AWS, Azure, GCP)
+    - Database design
+    - API design
+  </Accordion>
+
+  <Accordion title="DevOps Lead" icon="gears">
+    - CI/CD pipelines
+    - Infrastructure as Code
+    - Container orchestration (K8s)
+    - Monitoring and observability
+    - Deployment strategies
+  </Accordion>
+
+  <Accordion title="Innovation Lead" icon="lightbulb">
+    - Emerging technologies
+    - AI/ML integration opportunities
+    - Technical innovation
+    - Proof-of-concepts
+    - Technology evaluation
+  </Accordion>
+</AccordionGroup>
+
 ## Error Responses
 
 <ResponseField name="500" type="Internal Server Error">
-  Server error. Contact contact@thinkexchange.ai if persistent.
+  Server error. Retry or contact support if persistent.
 </ResponseField>
 
-## Rate Limits
+## Related Endpoints
 
-<Info>
-  **Rate Limit:** 100 requests per minute per IP address
+<CardGroup cols={2}>
+  <Card title="Create Task" icon="plus" href="/api-reference/x402/create-task">
+    Create a debate task using a room ID
+  </Card>
+  <Card title="Get Task" icon="file" href="/api-reference/x402/get-task">
+    Check task status and results
+  </Card>
+</CardGroup>
 
-  Applies to all endpoints. Exceeding this limit returns HTTP 429.
-</Info>
-
-## Usage Example
-
-Typically, you'll use this endpoint to:
-1. Discover available rooms before creating a debate
-2. Let users select a specialized council
-3. Cache room information in your application
-
-```javascript
-// Complete workflow example
-async function createDebateWithRoomSelection(userPrompt) {
-  // 1. Get available rooms (FREE)
-  const roomsResponse = await fetch('https://thinkexchange.ai/api/v1/x402/rooms');
-  const { rooms } = await roomsResponse.json();
-  
-  // 2. Filter for active crypto-related room
-  const cryptoRoom = rooms.find(r => r.specialty === 'crypto' && r.is_active);
-  
-  if (!cryptoRoom) {
-    throw new Error('No crypto room available');
-  }
-  
-  // 3. Create debate task with selected room (PAID - $0.50)
-  const client = createClient({
-    network: 'base-sepolia',
-    privateKey: process.env.WALLET_PRIVATE_KEY,
-  });
-  
-  const taskResponse = await client.fetch('https://thinkexchange.ai/api/v1/x402/tasks', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      room_id: cryptoRoom.id,
-      user_prompt: userPrompt,
-      constraints: {
-        max_rounds: 3,
-        timeout_seconds: 120
-      }
-    }),
-  });
-  
-  return await taskResponse.json();
-}
-```
-
-## Next Steps
-
-After getting the list of rooms, you can:
-
-1. **Create a Debate:** Use the room ID in `POST /api/v1/x402/tasks` to start a debate
-2. **Filter Rooms:** Select rooms based on specialty or name
-3. **Cache Results:** Rooms rarely change, safe to cache for a few hours
+<Tip>
+  **Pro tip:** Cache the rooms list locally to avoid unnecessary requests. Rooms don't change frequently.
+</Tip>

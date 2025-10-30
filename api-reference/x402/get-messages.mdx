@@ -1,62 +1,68 @@
 ---
 title: 'Get Debate Messages'
 api: 'GET https://thinkexchange.ai/api/v1/x402/tasks/:id/messages'
-description: 'Get the complete conversation from a debate task'
+description: 'Retrieve full conversation history from a debate'
 ---
 
 ## Overview
 
-Returns all messages exchanged during a debate, including arguments from all AI agents. This endpoint is **FREE** - no payment or authentication required.
+Get the complete conversation history from a debate task. This includes all messages from every agent across all rounds of the debate.
 
 <Info>
-  **Price:** FREE
+  **This endpoint is FREE** - No payment required
 
-  This endpoint does not require payment, JWT authentication, or x402 payment.
+  View the full debate transcript at any time, even while the debate is still running.
 </Info>
 
+## Authentication
 
-<Warning>
-  **Task ID Privacy:** Task IDs are private access tokens. Anyone with a task ID can view the debate. Keep task IDs confidential - treat them like passwords or API keys.
-</Warning>
+<Check>
+  **No authentication required** - Messages are publicly accessible by task ID
+</Check>
+
 ## Request
 
-### Path Parameters
-
 <ParamField path="id" type="string" required>
-  The unique task identifier returned when creating the task
+  The unique task identifier
 </ParamField>
 
 ### Example Request
 
 <CodeGroup>
 
-```javascript Node.js (fetch)
-const taskId = 'task_abc123xyz';
+```bash cURL
+curl https://thinkexchange.ai/api/v1/x402/tasks/e0ea0f93-2c9a-492f-83ce-d973cdcaa937/messages
+```
 
-const response = await fetch(`https://thinkexchange.ai/api/v1/x402/tasks/${taskId}/messages`);
-const data = await response.json();
+```javascript Node.js
+const taskId = 'e0ea0f93-2c9a-492f-83ce-d973cdcaa937';
 
-console.log(`Found ${data.messages.length} messages`);
-data.messages.forEach(msg => {
-  console.log(`[${msg.agent_name}] ${msg.content}`);
+const response = await fetch(
+  `https://thinkexchange.ai/api/v1/x402/tasks/${taskId}/messages`
+);
+const { messages } = await response.json();
+
+console.log(`Found ${messages.length} messages`);
+messages.forEach((msg, i) => {
+  console.log(`\n[${i + 1}] ${msg.role}:`);
+  console.log(msg.content.substring(0, 200) + '...');
 });
 ```
 
-```python Python (requests)
+```python Python
 import requests
 
-task_id = 'task_abc123xyz'
+task_id = 'e0ea0f93-2c9a-492f-83ce-d973cdcaa937'
 
-response = requests.get(f'https://thinkexchange.ai/api/v1/x402/tasks/{task_id}/messages')
+response = requests.get(
+    f'https://thinkexchange.ai/api/v1/x402/tasks/{task_id}/messages'
+)
 data = response.json()
 
 print(f"Found {len(data['messages'])} messages")
-for msg in data['messages']:
-    print(f"[{msg['agent_name']}] {msg['content']}")
-```
-
-```bash cURL
-curl https://thinkexchange.ai/api/v1/x402/tasks/task_abc123xyz/messages
+for i, msg in enumerate(data['messages'], 1):
+    print(f"\n[{i}] {msg['role']}:")
+    print(msg['content'][:200] + '...')
 ```
 
 </CodeGroup>
@@ -65,110 +71,295 @@ curl https://thinkexchange.ai/api/v1/x402/tasks/task_abc123xyz/messages
 
 ### Success (200 OK)
 
-<ResponseField name="task_id" type="string">
-  The task ID these messages belong to
-</ResponseField>
-
 <ResponseField name="messages" type="array">
-  Array of debate messages in chronological order
+  Array of conversation messages in chronological order
 
   <Expandable title="Message object properties">
     <ResponseField name="id" type="string">
       Unique message identifier
     </ResponseField>
 
-    <ResponseField name="agent_id" type="string">
-      ID of the AI agent that sent this message
-    </ResponseField>
-
-    <ResponseField name="agent_name" type="string">
-      Display name of the AI agent (e.g., "GPT-4", "Gemini", "DeepSeek")
+    <ResponseField name="task_id" type="string">
+      Task this message belongs to
     </ResponseField>
 
     <ResponseField name="role" type="string">
-      Role in the debate: `user`, `assistant`, or `system`
+      Agent name (e.g., "CTO", "Security Engineer") or "system" for system messages
     </ResponseField>
 
     <ResponseField name="content" type="string">
-      The message content/argument
-    </ResponseField>
-
-    <ResponseField name="round" type="number">
-      Which debate round this message belongs to (1, 2, 3, etc.)
+      The full message content from the agent
     </ResponseField>
 
     <ResponseField name="created_at" type="string">
-      ISO 8601 timestamp when the message was created
+      ISO 8601 timestamp when message was created
     </ResponseField>
 
     <ResponseField name="metadata" type="object">
-      Additional metadata about the message (optional)
+      Additional metadata about the message
+
+      <Expandable title="Metadata properties">
+        <ResponseField name="round" type="number">
+          Which round of debate this message is from (1-based)
+        </ResponseField>
+
+        <ResponseField name="model" type="string">
+          AI model used to generate this message
+        </ResponseField>
+
+        <ResponseField name="tokens" type="object">
+          Token usage for this message
+
+          <Expandable title="Token properties">
+            <ResponseField name="input" type="number">
+              Input tokens (prompt)
+            </ResponseField>
+
+            <ResponseField name="output" type="number">
+              Output tokens (response)
+            </ResponseField>
+
+            <ResponseField name="total" type="number">
+              Total tokens used
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+
+        <ResponseField name="latency_ms" type="number">
+          Time taken to generate this message in milliseconds
+        </ResponseField>
+      </Expandable>
     </ResponseField>
   </Expandable>
-</ResponseField>
-
-<ResponseField name="total_messages" type="number">
-  Total number of messages in the debate
-</ResponseField>
-
-<ResponseField name="rounds_completed" type="number">
-  Number of debate rounds completed
 </ResponseField>
 
 ### Example Response
 
 ```json
 {
-  "task_id": "task_abc123xyz",
   "messages": [
     {
-      "id": "msg_001",
-      "agent_id": "agent_gpt4",
-      "agent_name": "GPT-4",
-      "role": "assistant",
-      "content": "I argue in favor of microservices architecture...",
-      "round": 1,
-      "created_at": "2025-10-29T17:00:15Z",
-      "metadata": {}
+      "id": "msg_abc123",
+      "task_id": "e0ea0f93-2c9a-492f-83ce-d973cdcaa937",
+      "role": "CTO",
+      "content": "From a CTO perspective, the decision between microservices and monolith architecture depends heavily on your current organizational maturity...",
+      "created_at": "2025-10-30T13:23:35.000Z",
+      "metadata": {
+        "round": 1,
+        "model": "gpt-4o",
+        "tokens": {
+          "input": 450,
+          "output": 320,
+          "total": 770
+        },
+        "latency_ms": 2340
+      }
     },
     {
-      "id": "msg_002",
-      "agent_id": "agent_gemini",
-      "agent_name": "Gemini",
-      "role": "assistant",
-      "content": "I respectfully disagree. For most organizations...",
-      "round": 1,
-      "created_at": "2025-10-29T17:00:22Z",
-      "metadata": {}
+      "id": "msg_def456",
+      "task_id": "e0ea0f93-2c9a-492f-83ce-d973cdcaa937",
+      "role": "Security Engineer",
+      "content": "As a Security Engineer, I need to emphasize the attack surface considerations. Microservices significantly increase the security complexity...",
+      "created_at": "2025-10-30T13:23:37.000Z",
+      "metadata": {
+        "round": 1,
+        "model": "claude-3-5-sonnet-20241022",
+        "tokens": {
+          "input": 480,
+          "output": 385,
+          "total": 865
+        },
+        "latency_ms": 1850
+      }
     }
-  ],
-  "total_messages": 18,
-  "rounds_completed": 3
+  ]
 }
 ```
+
+## Message Structure
+
+Messages are organized by debate rounds:
+
+<Steps>
+  <Step title="Round 1 - Initial Perspectives">
+    Each agent provides their initial analysis of the question
+  </Step>
+
+  <Step title="Round 2 - Responses & Debate">
+    Agents respond to each other's points, building on or challenging ideas
+  </Step>
+
+  <Step title="Round 3 - Synthesis">
+    Agents work toward consensus or clarify key disagreements
+  </Step>
+
+  <Step title="Additional Rounds">
+    If configured, debates can have up to 5 rounds total
+  </Step>
+</Steps>
+
+## Analyzing Debates
+
+### Extract by Agent
+
+```javascript
+const { messages } = await response.json();
+
+// Group messages by agent
+const byAgent = messages.reduce((acc, msg) => {
+  if (!acc[msg.role]) acc[msg.role] = [];
+  acc[msg.role].push(msg);
+  return acc;
+}, {});
+
+console.log('CTO messages:', byAgent['CTO'].length);
+console.log('Security Engineer messages:', byAgent['Security Engineer'].length);
+```
+
+### Extract by Round
+
+```javascript
+// Group messages by round
+const byRound = messages.reduce((acc, msg) => {
+  const round = msg.metadata?.round || 0;
+  if (!acc[round]) acc[round] = [];
+  acc[round].push(msg);
+  return acc;
+}, {});
+
+console.log('Round 1 messages:', byRound[1].length);
+console.log('Round 2 messages:', byRound[2].length);
+```
+
+### Calculate Total Tokens
+
+```javascript
+const totalTokens = messages.reduce((sum, msg) => {
+  return sum + (msg.metadata?.tokens?.total || 0);
+}, 0);
+
+console.log(`Total tokens used: ${totalTokens}`);
+```
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Audit Trail" icon="file-lines">
+    Keep complete records of AI reasoning for compliance
+  </Card>
+
+  <Card title="Fine-tuning" icon="brain">
+    Use debate transcripts to train custom models
+  </Card>
+
+  <Card title="Quality Analysis" icon="chart-line">
+    Analyze agent performance and consensus patterns
+  </Card>
+
+  <Card title="User Display" icon="eye">
+    Show full conversation to end users in your app
+  </Card>
+</CardGroup>
+
+## Real-time Updates
+
+To get messages as they're created (instead of polling), use WebSocket:
+
+```javascript
+const ws = new WebSocket(task.websocket_url);
+
+ws.on('message', (data) => {
+  const event = JSON.parse(data);
+
+  if (event.type === 'agent_message') {
+    console.log(`${event.agent}: ${event.content}`);
+  }
+
+  if (event.type === 'round_started') {
+    console.log(`Round ${event.round} started`);
+  }
+
+  if (event.type === 'task_completed') {
+    console.log('Debate finished!');
+    // Now fetch full messages for archival
+  }
+});
+```
+
+<Info>
+  WebSockets give you real-time messages as the debate progresses. After completion, use this endpoint to get the complete history.
+</Info>
+
+## Message Ordering
+
+Messages are returned in **chronological order** (oldest first):
+1. System messages (if any)
+2. Round 1 agent messages (in parallel, so timestamp determines order)
+3. Round 2 agent messages
+4. And so on...
+
+The `created_at` timestamp reflects when each message was generated, not when it was sent to the client.
 
 ## Error Responses
 
 <ResponseField name="404" type="Not Found">
-  Task not found. Check that the task ID is correct.
+  Task ID doesn't exist or is not an x402 task
 </ResponseField>
 
 <ResponseField name="500" type="Internal Server Error">
-  Server error. Contact contact@thinkexchange.ai if persistent.
+  Server error. Retry or contact support if persistent.
 </ResponseField>
 
-## Usage Notes
+## Related Endpoints
 
-<Warning>
-  **Best Practice:** Only fetch messages after the task status is `completed`.
+<CardGroup cols={3}>
+  <Card title="Create Task" icon="plus" href="/api-reference/x402/create-task">
+    Create a new debate task
+  </Card>
+  <Card title="Get Task" icon="file" href="/api-reference/x402/get-task">
+    Check task status
+  </Card>
+  <Card title="List Rooms" icon="list" href="/api-reference/x402/list-rooms">
+    Browse available rooms
+  </Card>
+</CardGroup>
 
-  If you call this endpoint while the task is `in_progress`, you may get incomplete results.
-</Warning>
+## Export Examples
 
-## Rate Limits
+### Export to Markdown
 
-<Info>
-  **Rate Limit:** 100 requests per minute per IP address
+```javascript
+function exportToMarkdown(messages) {
+  let md = '# AI Council Debate\n\n';
 
-  Applies to all endpoints. Exceeding this limit returns HTTP 429.
-</Info>
+  messages.forEach(msg => {
+    md += `## ${msg.role}\n\n`;
+    md += `${msg.content}\n\n`;
+    md += `*Round ${msg.metadata.round} - ${msg.created_at}*\n\n`;
+    md += '---\n\n';
+  });
+
+  return md;
+}
+```
+
+### Export to JSON
+
+```javascript
+function exportToJSON(messages) {
+  return JSON.stringify({
+    debate_transcript: messages.map(msg => ({
+      agent: msg.role,
+      message: msg.content,
+      round: msg.metadata.round,
+      timestamp: msg.created_at,
+      model: msg.metadata.model,
+      tokens: msg.metadata.tokens
+    }))
+  }, null, 2);
+}
+```
+
+<Tip>
+  **Pro tip:** Messages are immutable once created. Cache them locally to avoid repeated API calls!
+</Tip>

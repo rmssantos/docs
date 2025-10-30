@@ -1,161 +1,225 @@
 ---
 title: 'API Reference'
-description: 'Complete API documentation for Think Exchange x402 endpoints'
+description: 'Think Exchange x402 Protocol API Documentation'
 ---
 
 ## Welcome to Think Exchange API
 
-The Think Exchange API enables you to create AI-powered multi-agent debates programmatically using the **x402 payment protocol**.
-
-<Info>
-  All endpoints are located at: `https://thinkexchange.ai/api/v1/x402/`
-</Info>
-
-## Available Endpoints
+Think Exchange provides a stateless, pay-per-use API for AI-powered multi-agent debates using the **x402 payment protocol**. Our API enables instant cryptocurrency payments (USDC) without requiring user authentication or accounts.
 
 <CardGroup cols={2}>
-  <Card
-    title="List Rooms"
-    icon="list"
-    href="/api-reference/x402/list-rooms"
-  >
-    Get all available council rooms (FREE)
+  <Card title="x402 Protocol" icon="bolt" href="https://x402.org">
+    HTTP 402 Payment Required standard for instant crypto payments
   </Card>
-  <Card
-    title="Create Task"
-    icon="plus"
-    href="/api-reference/x402/create-task"
-  >
-    Start a new debate ($0.50 USDC)
+  <Card title="Base Network" icon="layer-group" href="https://base.org">
+    Zero gas fees on Ethereum L2 network
   </Card>
-  <Card
-    title="Get Task"
-    icon="file"
-    href="/api-reference/x402/get-task"
-  >
-    Check debate status (FREE)
+  <Card title="USDC Payments" icon="dollar-sign">
+    Stablecoin payments (1 USDC = $1 USD)
   </Card>
-  <Card
-    title="Get Messages"
-    icon="messages"
-    href="/api-reference/x402/get-messages"
-  >
-    Retrieve debate conversation (FREE)
+  <Card title="No Accounts" icon="user-slash">
+    Stateless API - your wallet is your identity
   </Card>
 </CardGroup>
 
-## Authentication
+## Getting Started
 
-<Warning>
-  **No JWT Required** - The x402 protocol is completely stateless.
+<Steps>
+  <Step title="Install x402 SDK">
+    ```bash
+    npm install x402-fetch viem
+    ```
+  </Step>
 
-  Your wallet address is your identity. Payment is verified via EIP-712 signatures.
-</Warning>
+  <Step title="Get Test USDC">
+    Visit [Circle Faucet](https://faucet.circle.com/) to get free USDC on Base Sepolia testnet
+  </Step>
 
-### Using x402 SDK
+  <Step title="Make Your First Request">
+    ```javascript
+    import { createSigner, wrapFetchWithPayment } from 'x402-fetch';
 
-Install the x402 SDK to handle payment automatically:
+    const signer = await createSigner('base-sepolia', process.env.WALLET_PRIVATE_KEY);
+    const fetchWithPayment = wrapFetchWithPayment(fetch, signer);
 
-<CodeGroup>
+    const response = await fetchWithPayment('https://thinkexchange.ai/api/v1/x402/tasks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        room_id: 'room_id',
+        user_prompt: 'Your question here'
+      })
+    });
 
-```bash npm
-npm install x402-fetch
-```
+    const task = await response.json();
+    console.log('Task created:', task.id);
+    ```
+  </Step>
+</Steps>
 
-```bash Python
-pip install x402
-```
+## Core Concepts
 
-</CodeGroup>
+### x402 Payment Flow
 
-## Quick Example
+<Steps>
+  <Step title="Client sends request">
+    Your application makes a normal HTTP request without payment
+  </Step>
 
-```javascript
-import { createClient } from 'x402-fetch';
+  <Step title="Server returns 402">
+    Server responds with HTTP 402 and payment requirements
+  </Step>
 
-const client = createClient({
-  network: 'base-sepolia',
-  privateKey: process.env.WALLET_PRIVATE_KEY,
-});
+  <Step title="SDK signs payment">
+    x402 SDK automatically creates EIP-712 signature with your wallet
+  </Step>
 
-// 1. List rooms (FREE)
-const rooms = await fetch('https://thinkexchange.ai/api/v1/x402/rooms')
-  .then(r => r.json());
+  <Step title="Client retries with payment">
+    SDK retries request with `X-PAYMENT` header containing signature
+  </Step>
 
-// 2. Create debate (PAID - $0.50)
-const task = await client.fetch('https://thinkexchange.ai/api/v1/x402/tasks', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    room_id: rooms.rooms[0].id,
-    user_prompt: 'Your question here',
-  }),
-}).then(r => r.json());
+  <Step title="Facilitator validates">
+    PayAI Network facilitator validates signature and USDC balance
+  </Step>
 
-// 3. Check status (FREE)
-const status = await fetch(`https://thinkexchange.ai/api/v1/x402/tasks/${task.id}`)
-  .then(r => r.json());
-```
+  <Step title="Server processes request">
+    Payment verified ✅ - Server processes your request and responds
+  </Step>
+</Steps>
+
+<Info>
+  **All payment logic is handled by the SDK** - You don't need to manually handle HTTP 402 responses or create signatures. Just use `wrapFetchWithPayment` and it works like normal fetch!
+</Info>
+
+### Stateless Architecture
+
+Unlike traditional APIs:
+- ❌ No user registration
+- ❌ No JWT tokens
+- ❌ No API keys
+- ✅ Wallet address is your identity
+- ✅ EIP-712 signatures prove payment
+- ✅ Instant payments, no credit system
+
+### Networks
+
+<Tabs>
+  <Tab title="Testnet (Base Sepolia)">
+    **For Development & Testing**
+
+    - Network: `base-sepolia`
+    - Free USDC from [Circle Faucet](https://faucet.circle.com/)
+    - Facilitator: `https://facilitator.payai.network`
+    - USDC Contract: `0x036CbD53842c5426634e7929541eC2318f3dCF7e`
+    - RPC: `https://sepolia.base.org`
+  </Tab>
+
+  <Tab title="Mainnet (Base)">
+    **For Production**
+
+    - Network: `base`
+    - Real USDC (purchase on exchanges)
+    - Facilitator: Coinbase CDP
+    - USDC Contract: `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`
+    - RPC: `https://mainnet.base.org`
+    - Zero gas fees (Base covers transaction costs)
+  </Tab>
+</Tabs>
 
 ## Pricing
 
-| Endpoint | Cost | Rate Limit |
-| --- | --- | --- |
-| `GET /x402/rooms` | **FREE** | 100/min |
-| `POST /x402/tasks` | **$0.50 USDC** | 100/min |
-| `GET /x402/tasks/:id` | **FREE** | 100/min |
-| `GET /x402/tasks/:id/messages` | **FREE** | 100/min |
+<Card title="Fixed Price per Debate" icon="dollar-sign">
+  **$0.50 USD** paid in USDC
 
-<Info>
-  Only creating a debate costs money. All other endpoints are completely free!
-</Info>
+  Includes:
+  - 5 specialized AI agents (CTO, Security Engineer, Solutions Architect, etc.)
+  - Up to 5 rounds of debate (default 3)
+  - Real-time WebSocket updates
+  - Full conversation history
+  - 120 seconds maximum processing time
+</Card>
 
-## Payment Network
-
-<CardGroup cols={2}>
-  <Card title="Testnet" icon="flask">
-    **Network:** Base Sepolia
-    
-    **USDC:** Free testnet tokens from [Circle Faucet](https://faucet.circle.com/)
-    
-    **Gas Fees:** Zero (covered by Base)
-  </Card>
-  <Card title="Mainnet" icon="shield">
-    **Network:** Base
-    
-    **USDC:** Real USDC tokens
-    
-    **Gas Fees:** Zero (covered by Base)
-  </Card>
-</CardGroup>
+<Tip>
+  No hidden fees! The price includes all AI model costs, orchestration, and infrastructure.
+</Tip>
 
 ## Rate Limits
 
 <Warning>
-  **Rate Limit:** 100 requests per minute per IP address
+  **100 requests per minute** per IP address
 
-  Applies to all endpoints. Exceeding this limit returns HTTP 429.
+  This applies to ALL endpoints. Rate limit headers are returned in responses:
+  - `RateLimit-Limit`: Maximum requests per window
+  - `RateLimit-Remaining`: Remaining requests
+  - `RateLimit-Reset`: Seconds until limit resets
 </Warning>
+
+## API Endpoints
+
+### x402 Protocol Endpoints (Stateless)
+
+<CardGroup cols={2}>
+  <Card title="POST /x402/tasks" icon="plus" href="/api-reference/x402/create-task">
+    Create a new AI debate task ($0.50)
+  </Card>
+  <Card title="GET /x402/tasks/:id" icon="file" href="/api-reference/x402/get-task">
+    Get task status and results (free)
+  </Card>
+  <Card title="GET /x402/tasks/:id/messages" icon="messages" href="/api-reference/x402/get-messages">
+    Get full debate conversation (free)
+  </Card>
+  <Card title="GET /x402/rooms" icon="list" href="/api-reference/x402/list-rooms">
+    List available council rooms (free)
+  </Card>
+</CardGroup>
+
+## SDKs & Tools
+
+<CardGroup cols={3}>
+  <Card title="JavaScript/TypeScript" icon="js">
+    ```bash
+    npm install x402-fetch viem
+    ```
+  </Card>
+  <Card title="Python" icon="python">
+    ```bash
+    pip install x402
+    ```
+  </Card>
+  <Card title="Go" icon="golang">
+    ```bash
+    go get github.com/coinbase/x402-go
+    ```
+  </Card>
+</CardGroup>
 
 ## Support
 
-Need help? Contact us at **contact@thinkexchange.ai**
-
-## Next Steps
-
 <CardGroup cols={2}>
-  <Card
-    title="Quick Start Guide"
-    icon="rocket"
-    href="/quickstart"
-  >
-    Get started in 5 minutes
+  <Card title="Documentation" icon="book" href="https://x402.org">
+    Official x402 Protocol docs
   </Card>
-  <Card
-    title="x402 Protocol"
-    icon="bolt"
-    href="https://x402.org"
-  >
-    Learn about the payment protocol
+  <Card title="Email Support" icon="envelope" href="mailto:contact@thinkexchange.ai">
+    Technical support and questions
+  </Card>
+  <Card title="GitHub Examples" icon="github" href="https://github.com/coinbase/x402">
+    Code examples and SDKs
+  </Card>
+  <Card title="Base Docs" icon="layer-group" href="https://docs.base.org">
+    Learn about Base network
   </Card>
 </CardGroup>
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 400  | Bad Request - Invalid parameters |
+| 402  | Payment Required - SDK handles automatically |
+| 404  | Not Found - Task or room doesn't exist |
+| 429  | Too Many Requests - Rate limit exceeded |
+| 500  | Internal Server Error - Contact support |
+
+<Tip>
+  **Ready to start?** Jump to [Create Task](/api-reference/x402/create-task) to make your first AI debate!
+</Tip>
