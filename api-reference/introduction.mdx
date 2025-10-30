@@ -101,10 +101,10 @@ const status = await fetch(`https://thinkexchange.ai/api/v1/x402/tasks/${task.id
 
 | Endpoint | Cost | Rate Limit |
 | --- | --- | --- |
-| `GET /x402/rooms` | **FREE** | 500/min |
-| `POST /x402/tasks` | **$0.50 USDC** | 500/min |
-| `GET /x402/tasks/:id` | **FREE** | 500/min |
-| `GET /x402/tasks/:id/messages` | **FREE** | 500/min |
+| `GET /x402/rooms` | **FREE** | 100/min |
+| `POST /x402/tasks` | **$0.50 USDC** | 100/min |
+| `GET /x402/tasks/:id` | **FREE** | 100/min |
+| `GET /x402/tasks/:id/messages` | **FREE** | 100/min |
 
 <Info>
   Only creating a debate costs money. All other endpoints are completely free!
@@ -132,7 +132,7 @@ const status = await fetch(`https://thinkexchange.ai/api/v1/x402/tasks/${task.id
 ## Rate Limits
 
 <Warning>
-  **Rate Limit:** 500 requests per minute per IP address
+  **Rate Limit:** 100 requests per minute per IP address
 
   Applies to all endpoints. Exceeding this limit returns HTTP 429.
 </Warning>

@@ -158,6 +158,18 @@ curl -X POST https://thinkexchange.ai/api/v1/x402/tasks \
 }
 ```
 
+
+<Warning>
+  **Keep Your Task ID Private!**
+
+  The task ID returned is your **private access token** to view this debate. Anyone with this ID can access the task status, prompt, and results.
+
+  - Do NOT share task IDs publicly (logs, URLs, screenshots)
+  - Store task IDs securely (like API keys or passwords)
+  - Task IDs are UUIDs (impossible to guess) - treat them as secrets
+
+  This is intentional: x402 is stateless, so the task ID IS your proof of ownership.
+</Warning>
 ### Payment Required (402)
 
 When no payment is provided, the server returns 402 with payment requirements:
@@ -208,7 +220,7 @@ When no payment is provided, the server returns 402 with payment requirements:
 </ResponseField>
 
 <ResponseField name="429" type="Too Many Requests">
-  Rate limit exceeded (500 requests per minute per IP)
+  Rate limit exceeded (100 requests per minute per IP)
 </ResponseField>
 
 <ResponseField name="500" type="Internal Server Error">
@@ -246,7 +258,7 @@ Once created, you can:
 ## Rate Limits
 
 <Warning>
-  **Rate Limit:** 500 requests per minute per IP address
+  **Rate Limit:** 100 requests per minute per IP address
 
   Applies to all x402 endpoints. Exceeding this limit returns HTTP 429.
 </Warning>
