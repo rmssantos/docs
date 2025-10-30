@@ -67,9 +67,6 @@
     "x": "https://x.com/thinkexchangeai"
   },
   "api": {
-    "baseUrl": "https://thinkexchange.ai/api/v1",
-    "playground": {
-      "mode": "simple"
-    }
+    "baseUrl": "https://thinkexchange.ai/api/v1"
   }
 }
